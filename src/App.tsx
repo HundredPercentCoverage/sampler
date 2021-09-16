@@ -109,7 +109,7 @@ function App() {
       <div className="flex flex-row justify-center">
         <h1 className="text-2xl">Sampler</h1>
       </div>
-      <div className="flex flex-row items-center justify-center space-x-4">
+      <div className="flex flex-row flex-wrap items-center justify-center space-x-4">
         {samplesLoaded ? (
           notes.map(noteItem => (
             <button
