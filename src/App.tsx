@@ -64,6 +64,15 @@ function App() {
     sampler.triggerAttackRelease(note, 0.5);
   }
 
+  const handleClick = (note: INote) => {
+    setPressedKeys(prevPressedKeys => [
+      ...prevPressedKeys,
+     note.key
+    ]);
+
+    playNote(note.note);
+  }
+
   useEffect(() => {
     const handleKeyPress = (e: any) => {
       const { key } = e;
@@ -105,7 +114,8 @@ function App() {
           notes.map(noteItem => (
             <button
               className={`border-2 border-black rounded-md py-4 px-6 ${pressedKeys.includes(noteItem.key) && 'bg-black text-white'}`}
-              onClick={() => playNote(noteItem.note)}
+              onMouseDown={() => handleClick(noteItem)}
+              onMouseUp={() => setPressedKeys(prevPressedKeys => prevPressedKeys.filter(key => key !== noteItem.key))}
               key={noteItem.note}
             >
               {noteItem.key.toUpperCase()}
