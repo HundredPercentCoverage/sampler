@@ -115,6 +115,8 @@ function App() {
             <button
               className={`border-2 border-black rounded-md py-4 px-6 ${pressedKeys.includes(noteItem.key) && 'bg-black text-white'}`}
               onMouseDown={() => handleClick(noteItem)}
+              onTouchStart={() => handleClick(noteItem)}
+              onTouchEnd={() => setPressedKeys(prevPressedKeys => prevPressedKeys.filter(key => key !== noteItem.key))}
               onMouseUp={() => setPressedKeys(prevPressedKeys => prevPressedKeys.filter(key => key !== noteItem.key))}
               key={noteItem.note}
             >
