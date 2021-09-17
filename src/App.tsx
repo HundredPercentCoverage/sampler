@@ -76,40 +76,42 @@ function App() {
   useEffect(() => {
     const handleKeyPress = (e: any) => {
       const { key } = e;
-      if (key === 'a') playNote('C1');
-      if (key === 's') playNote('D1');
-      if (key === 'd') playNote('E1');
-      if (key === 'f') playNote('F1');
-      if (key === 'g') playNote('G1');
-      if (key === 'h') playNote('A1');
-      if (key === 'j') playNote('B1');
-      if (key === 'k') playNote('C2');
-
-      setPressedKeys(prevPressedKeys => [
-        ...prevPressedKeys,
-        key
-      ]);
+      if (!pressedKeys.includes(key)) {
+        if (key === 'a') playNote('C1');
+        if (key === 's') playNote('D1');
+        if (key === 'd') playNote('E1');
+        if (key === 'f') playNote('F1');
+        if (key === 'g') playNote('G1');
+        if (key === 'h') playNote('A1');
+        if (key === 'j') playNote('B1');
+        if (key === 'k') playNote('C2');
+  
+        setPressedKeys(prevPressedKeys => [
+          ...prevPressedKeys,
+          key
+        ]);
+      }
     }
 
     const handleKeyUp = (e: any) => {
       setPressedKeys(prevPressedKeys => prevPressedKeys.filter(key => key !== e.key));
     }
 
-    window.addEventListener('keypress', handleKeyPress);
+    window.addEventListener('keydown', handleKeyPress);
     window.addEventListener('keyup', handleKeyUp);
 
     return () => {
-      window.removeEventListener('keypress', handleKeyPress);
+      window.removeEventListener('keydown', handleKeyPress);
       window.removeEventListener('keyup', handleKeyUp);
     }
   });
 
   return (
     <div className="max-w-screen-xl mx-auto">
-      <div className="flex flex-row justify-center">
+      <div className="flex flex-row justify-center pb-8">
         <h1 className="text-2xl">Sampler</h1>
       </div>
-      <div className="flex flex-row flex-wrap items-center justify-center space-x-4">
+      <div className="flex flex-row flex-wrap items-center justify-center space-x-4 pb-8">
         {samplesLoaded ? (
           notes.map(noteItem => (
             <button
