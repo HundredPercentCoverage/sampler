@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as Tone from 'tone';
 import audioFileUrl from '../fart.ogg';
 
@@ -48,20 +48,19 @@ const notes: INote[] = [
 // Have to declare this outside as Tone doesn't like it otherwise
 // https://stackoverflow.com/a/57527608/9508975
 const buffer = new Tone.Buffer(audioFileUrl);
+const recorder = new Tone.Recorder();
+const mic = new Tone.UserMedia().connect(recorder);
+const ctx = new Tone.Context();
+const sampler = new Tone.Sampler().toDestination();
 
 function App() {
   const [samplesLoaded, setSamplesLoaded] = useState(false);
   const [pressedKeys, setPressedKeys] = useState<string[]>([]);
-
-  const sampler = new Tone.Sampler({
-    urls: {
-      A1: buffer
-    },
-    onload: () => setSamplesLoaded(true)
-  }).toDestination();
+  const [isRecording, setIsRecording] = useState(false);
+  const samplerRef = useRef(sampler);
 
   const playNote = (note: string | string[]) => {
-    sampler.triggerAttackRelease(note, 0.5);
+    sampler.triggerAttackRelease(note, 1);
   }
 
   const handleClick = (note: INote) => {
@@ -73,10 +72,23 @@ function App() {
     playNote(note.note);
   }
 
+  const handleRecordClick = () => {
+    setIsRecording(true);
+    setSamplesLoaded(false);
+    recorder.start();
+    ctx.setTimeout(async () => {
+      const recording = await recorder.stop();
+      samplerRef.current.add('A1', URL.createObjectURL(recording), () => setSamplesLoaded(true));
+      setIsRecording(false);
+    }, 1);
+  }
+
   useEffect(() => {
-    const handleKeyPress = (e: any) => {
-      const { key } = e;
-      if (!pressedKeys.includes(key)) {
+    samplerRef.current.add('A1', buffer, () => setSamplesLoaded(true));
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      const { key, repeat } = e;
+      if (!repeat) {
         if (key === 'a') playNote('C1');
         if (key === 's') playNote('D1');
         if (key === 'd') playNote('E1');
@@ -93,9 +105,11 @@ function App() {
       }
     }
 
-    const handleKeyUp = (e: any) => {
+    const handleKeyUp = (e: KeyboardEvent) => {
       setPressedKeys(prevPressedKeys => prevPressedKeys.filter(key => key !== e.key));
     }
+
+    mic.open().then(() => console.log('mic open')).catch(e => console.error(e));
 
     window.addEventListener('keydown', handleKeyPress);
     window.addEventListener('keyup', handleKeyUp);
@@ -103,31 +117,39 @@ function App() {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
       window.removeEventListener('keyup', handleKeyUp);
+      buffer.dispose();
+      samplerRef.current.dispose();
     }
-  });
+  }, []);
 
   return (
     <div className="max-w-screen-xl mx-auto">
       <div className="flex flex-row justify-center pb-8">
-        <h1 className="text-2xl">Sampler</h1>
+        <h1 className="text-2xl">One-Second Sampler</h1>
       </div>
       <div className="flex flex-row flex-wrap items-center justify-center space-x-4 pb-8">
-        {samplesLoaded ? (
-          notes.map(noteItem => (
-            <button
-              className={`border-2 border-black rounded-md py-4 px-6 ${pressedKeys.includes(noteItem.key) && 'bg-black text-white'}`}
-              onMouseDown={() => handleClick(noteItem)}
-              onTouchStart={() => setPressedKeys(prevPressedKeys => [...prevPressedKeys, noteItem.key])}
-              onTouchEnd={() => setPressedKeys(prevPressedKeys => prevPressedKeys.filter(key => key !== noteItem.key))}
-              onMouseUp={() => setPressedKeys(prevPressedKeys => prevPressedKeys.filter(key => key !== noteItem.key))}
-              key={noteItem.note}
-            >
-              {noteItem.key.toUpperCase()}
-            </button>
-          ))
-        ) : (
-          <span>Loading...</span>
-        )}
+        {notes.map((noteItem, index) => (
+          <button
+            className={`border-2 border-black rounded-md py-4 px-6 w-16 ${pressedKeys.includes(noteItem.key) || !samplesLoaded && 'bg-black text-white'}`}
+            onMouseDown={() => handleClick(noteItem)}
+            onTouchStart={() => setPressedKeys(prevPressedKeys => [...prevPressedKeys, noteItem.key])}
+            onTouchEnd={() => setPressedKeys(prevPressedKeys => prevPressedKeys.filter(key => key !== noteItem.key))}
+            onMouseUp={() => setPressedKeys(prevPressedKeys => prevPressedKeys.filter(key => key !== noteItem.key))}
+            key={noteItem.note}
+            disabled={!samplesLoaded}
+          >
+            <span>{samplesLoaded ? noteItem.key.toUpperCase() : 'LOADING!'[index]}</span>
+          </button>
+        ))}
+      </div>
+      <div className="flex flex-row justify-center items-center">
+        <button
+          className="py-2 px-4 bg-red-700 text-white font-semi disabled:bg-red-300 disabled:cursor-not-allowed rounded-md"
+          onClick={handleRecordClick}
+          disabled={isRecording}
+        >
+          {isRecording ? 'Recording...' : 'Record'}
+        </button>
       </div>
     </div>
   )
