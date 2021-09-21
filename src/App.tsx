@@ -130,7 +130,7 @@ function App() {
       <div className="flex flex-row flex-wrap items-center justify-center space-x-4 pb-8">
         {notes.map((noteItem, index) => (
           <button
-            className={`border-2 border-black rounded-md py-4 px-6 w-16 ${pressedKeys.includes(noteItem.key) || !samplesLoaded && 'bg-black text-white'}`}
+            className={`border-2 border-black rounded-md py-4 px-6 w-16 ${(pressedKeys.includes(noteItem.key) || !samplesLoaded) && 'bg-black text-white'}`}
             onMouseDown={() => handleClick(noteItem)}
             onTouchStart={() => setPressedKeys(prevPressedKeys => [...prevPressedKeys, noteItem.key])}
             onTouchEnd={() => setPressedKeys(prevPressedKeys => prevPressedKeys.filter(key => key !== noteItem.key))}
