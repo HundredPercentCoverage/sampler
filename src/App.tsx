@@ -78,7 +78,8 @@ function App() {
     recorder.start();
     ctx.setTimeout(async () => {
       const recording = await recorder.stop();
-      samplerRef.current.add('A1', URL.createObjectURL(recording), () => setSamplesLoaded(true));
+      samplerRef.current.add('A1', URL.createObjectURL(recording));
+      setSamplesLoaded(true);
       setIsRecording(false);
     }, 1);
   }
