@@ -79,7 +79,7 @@ function App() {
     if (ctx.state === 'suspended') {
       await ctx.resume();
     }
-    
+
     recorder.start();
     ctx.setTimeout(async () => {
       const recording = await recorder.stop();
@@ -129,9 +129,9 @@ function App() {
   }, []);
 
   return (
-    <div className="max-w-screen-xl mx-auto">
+    <div className="max-w-screen-xl mx-auto py-8">
       <div className="flex flex-row justify-center pb-8">
-        <h1 className="text-2xl">One-Second Sampler</h1>
+        <h1 className="text-2xl font-bold">One-Second Sampler</h1>
       </div>
       <div className="flex flex-row flex-wrap items-center justify-center space-x-4 pb-8">
         {notes.map((noteItem, index) => (
@@ -144,7 +144,7 @@ function App() {
             key={noteItem.note}
             disabled={!samplesLoaded}
           >
-            <span>{samplesLoaded ? noteItem.key.toUpperCase() : 'LOADING!'[index]}</span>
+            <span>{samplesLoaded ? noteItem.key : 'LOADING!'[index]}</span>
           </button>
         ))}
       </div>

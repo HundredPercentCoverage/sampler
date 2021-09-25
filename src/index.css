@@ -1,3 +1,18 @@
 @tailwind base;
+
+@font-face {
+  font-family: "Comfortaa";
+  src: url("../assets/Comfortaa-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Comfortaa";
+  src: url("../assets/Comfortaa-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-display: swap;
+}
+
 @tailwind components;
 @tailwind utilities;
