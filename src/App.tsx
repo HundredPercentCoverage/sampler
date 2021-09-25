@@ -72,9 +72,14 @@ function App() {
     playNote(note.note);
   }
 
-  const handleRecordClick = () => {
+  const handleRecordClick = async () => {
     setIsRecording(true);
     setSamplesLoaded(false);
+
+    if (ctx.state === 'suspended') {
+      await ctx.resume();
+    }
+    
     recorder.start();
     ctx.setTimeout(async () => {
       const recording = await recorder.stop();
