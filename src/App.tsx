@@ -45,9 +45,6 @@ const notes: INote[] = [
   },
 ];
 
-// Have to declare this outside as Tone doesn't like it otherwise
-// https://stackoverflow.com/a/57527608/9508975
-const buffer = new Tone.Buffer(audioFileUrl);
 const recorder = new Tone.Recorder();
 const mic = new Tone.UserMedia().connect(recorder);
 const ctx = new Tone.Context();
@@ -57,10 +54,11 @@ function App() {
   const [samplesLoaded, setSamplesLoaded] = useState(false);
   const [pressedKeys, setPressedKeys] = useState<string[]>([]);
   const [isRecording, setIsRecording] = useState(false);
+  const [audioIsOn, setAudioIsOn] = useState(false);
   const samplerRef = useRef(sampler);
 
   const playNote = (note: string | string[]) => {
-    sampler.triggerAttackRelease(note, 1);
+    samplerRef.current.triggerAttackRelease(note, 1);
   }
 
   const handleClick = (note: INote) => {
@@ -83,15 +81,24 @@ function App() {
     recorder.start();
     ctx.setTimeout(async () => {
       const recording = await recorder.stop();
-      samplerRef.current.add('A1', URL.createObjectURL(recording));
-      setSamplesLoaded(true);
+      samplerRef.current.add('A1', URL.createObjectURL(recording), () => setSamplesLoaded(true));
       setIsRecording(false);
     }, 1);
   }
 
-  useEffect(() => {
-    samplerRef.current.add('A1', buffer, () => setSamplesLoaded(true));
+  const turnOnAudioClick = async () => {
+    await Tone.start();
+    setAudioIsOn(true);
 
+    samplerRef.current = new Tone.Sampler({
+      urls: { 
+        A1: audioFileUrl
+      },
+      onload: () => setSamplesLoaded(true)
+    }).toDestination();
+  }
+
+  useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       const { key, repeat } = e;
       if (!repeat) {
@@ -123,7 +130,6 @@ function App() {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
       window.removeEventListener('keyup', handleKeyUp);
-      buffer.dispose();
       samplerRef.current.dispose();
     }
   }, []);
@@ -136,26 +142,35 @@ function App() {
       <div className="flex flex-row flex-wrap items-center justify-center space-x-4 pb-8">
         {notes.map((noteItem, index) => (
           <button
-            className={`border-2 border-black rounded-md py-4 px-6 w-16 ${(pressedKeys.includes(noteItem.key) || !samplesLoaded) && 'bg-black text-white'}`}
+            className={`border-2 border-black rounded-md py-4 px-6 w-16 disabled:cursor-not-allowed disabled:opacity-50 ${(pressedKeys.includes(noteItem.key) || !samplesLoaded) && 'bg-black text-white'}`}
             onMouseDown={() => handleClick(noteItem)}
             onTouchStart={() => setPressedKeys(prevPressedKeys => [...prevPressedKeys, noteItem.key])}
             onTouchEnd={() => setPressedKeys(prevPressedKeys => prevPressedKeys.filter(key => key !== noteItem.key))}
             onMouseUp={() => setPressedKeys(prevPressedKeys => prevPressedKeys.filter(key => key !== noteItem.key))}
             key={noteItem.note}
-            disabled={!samplesLoaded}
+            disabled={!samplesLoaded || !audioIsOn}
           >
-            <span>{samplesLoaded ? noteItem.key : 'LOADING!'[index]}</span>
+            <span>{samplesLoaded ? noteItem.key : 'WAITING!'[index]}</span>
           </button>
         ))}
       </div>
       <div className="flex flex-row justify-center items-center">
-        <button
-          className="py-2 px-4 bg-red-700 text-white font-semi disabled:bg-red-300 disabled:cursor-not-allowed rounded-md"
-          onClick={handleRecordClick}
-          disabled={isRecording}
-        >
-          {isRecording ? 'Recording...' : 'Record'}
-        </button>
+        {audioIsOn ? (
+          <button
+            className="py-2 px-4 bg-red-700 text-white font-bold disabled:bg-red-300 disabled:cursor-not-allowed rounded-md"
+            onClick={handleRecordClick}
+            disabled={isRecording}
+          >
+            {isRecording ? 'Recording...' : 'Record'}
+          </button>
+        ) : (
+          <button
+            className="py-2 px-4 bg-green-500 text-white font-bold hover:opacity-50 focus:opacity-50 rounded-md"
+            onClick={turnOnAudioClick}
+          >
+            Turn on
+          </button>
+        )}
       </div>
     </div>
   )
