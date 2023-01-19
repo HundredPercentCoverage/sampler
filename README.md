@@ -9,3 +9,5 @@ Made by messing around with [Vite](https://vitejs.dev/), [Tone.js](https://tonej
 - Clone repo
 - `cd` into repo and run `npm install`
 - Run `npm run dev` inside repo and visit `localhost:3000`
+
+Have fun.
