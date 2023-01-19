@@ -135,11 +135,11 @@ function App() {
   }, []);
 
   return (
-    <div className="max-w-screen-xl mx-auto py-8">
+    <main className="max-w-screen-xl py-8 mx-auto">
       <div className="flex flex-row justify-center pb-8">
         <h1 className="text-2xl font-bold">One-Second Sampler</h1>
       </div>
-      <div className="flex flex-row flex-wrap items-center justify-center space-x-4 pb-8">
+      <div className="flex flex-row flex-wrap items-center justify-center gap-4 pb-8">
         {notes.map((noteItem, index) => (
           <button
             className={`border-2 border-black rounded-md py-4 px-6 w-16 disabled:cursor-not-allowed disabled:opacity-50 ${(pressedKeys.includes(noteItem.key) || !samplesLoaded) && 'bg-black text-white'}`}
@@ -154,10 +154,10 @@ function App() {
           </button>
         ))}
       </div>
-      <div className="flex flex-row justify-center items-center">
+      <div className="flex flex-row items-center justify-center mb-12">
         {audioIsOn ? (
           <button
-            className="py-2 px-4 bg-red-700 text-white font-bold disabled:bg-red-300 disabled:cursor-not-allowed rounded-md"
+            className="px-4 py-2 font-bold text-white bg-red-700 rounded-md disabled:bg-red-300 disabled:cursor-not-allowed"
             onClick={handleRecordClick}
             disabled={isRecording}
           >
@@ -165,14 +165,26 @@ function App() {
           </button>
         ) : (
           <button
-            className="py-2 px-4 bg-green-500 text-white font-bold hover:opacity-50 focus:opacity-50 rounded-md"
+            className="px-4 py-2 font-bold text-white bg-green-500 rounded-md hover:opacity-50 focus:opacity-50"
             onClick={turnOnAudioClick}
           >
             Turn on
           </button>
         )}
       </div>
-    </div>
+      <div className="flex justify-center px-4">
+        <div className="flex flex-col items-center max-w-2xl">
+          <h2 className="my-2 font-bold underline">How to use:</h2>
+          <ul className="space-y-1 text-sm list-disc list-inside">
+            <li>Give permission for microphone access if prompted.</li>
+            <li>Click the "Turn On" button to activate the sampler and keyboard.</li>
+            <li>Use the keyboard / mouse / touchscreen on the boxes to play the default sound.</li>
+            <li>Click 'Record' to record a sample. Recording starts immediately for one second - you might need to get used to the timing!</li>
+            <li>The new sample will be playable when recording stops.</li>
+          </ul>
+        </div>
+      </div>
+    </main>
   )
 }
 
