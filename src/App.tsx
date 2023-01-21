@@ -177,10 +177,11 @@ function App() {
           <h2 className="my-2 font-bold underline">How to use:</h2>
           <ul className="space-y-1 text-sm list-disc list-inside">
             <li>Give permission for microphone access if prompted.</li>
-            <li>Click the "Turn On" button to activate the sampler and keyboard.</li>
-            <li>Use the keyboard / mouse / touchscreen on the boxes to play the default sound.</li>
-            <li>Click 'Record' to record a sample. Recording starts immediately for one second - you might need to get used to the timing!</li>
-            <li>The new sample will be playable when recording stops.</li>
+            <li>Click the "Turn On" button to activate the sampler and keys.</li>
+            <li>Use the keyboard / mouse / touchscreen on the keys to play the default sound.</li>
+            <li>Click 'Record' to record a sample from your microphone. Recording starts immediately for one second - you might need to get used to the timing! The keyboard will deactivate during the recording.</li>
+            <li>The new sample will be playable when recording stops and the keys will reactivate.</li>
+            <li>You will be able to play the keys again with the new sample.</li>
           </ul>
         </div>
       </div>
